@@ -5,13 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gia Sư AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    
+    <!-- Bổ sung cấu hình MathJax để nhận diện công thức LaTeX -->
+    <script>
+        window.MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']]
+          },
+          svg: {
+            fontCache: 'global'
+          }
+        };
+    </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Noto Sans', sans-serif;
             background-color: #f0f2f5;
         }
         .prose {
@@ -76,6 +91,22 @@
             font-weight: bold;
             line-height: 1;
         }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #2d3748;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .toast.show {
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
@@ -91,7 +122,7 @@
             <main class="p-6">
                 <div id="input-container">
                     <label for="question-input" class="block text-sm font-medium text-gray-700 mb-2">Nhập câu hỏi hoặc dán hình ảnh vào đây:</label>
-                    <textarea id="question-input" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Ví dụ: Giải phương trình x^2 - 5x + 6 = 0"></textarea>
+                    <textarea id="question-input" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Ví dụ: Tìm giá trị lớn nhất của hàm số y = sin(x) + 2"></textarea>
 
                     <div id="image-preview-container" class="mt-4 hidden"></div>
 
@@ -102,7 +133,7 @@
                         <input type="file" id="image-upload" class="hidden" accept="image/*">
                         
                         <button id="submit-btn" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md">
-                            Gửi
+                            Giáo viên hướng dẫn
                         </button>
                     </div>
                 </div>
@@ -114,8 +145,14 @@
                 </div>
 
                 <div id="result-container" class="mt-6 hidden">
-                     <h2 class="text-2xl font-bold text-gray-800 border-b pb-3 mb-4">Hướng dẫn giải bài tập</h2>
+                     <div class="flex justify-between items-center border-b pb-3 mb-4">
+                        <h2 class="text-2xl font-bold text-gray-800">Hướng dẫn giải bài tập</h2>
+                        <button id="copy-btn" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-1 px-3 rounded-lg transition">
+                            Sao chép
+                        </button>
+                     </div>
                     <div id="result" class="prose max-w-none"></div>
+                    <p class="text-xs text-gray-500 mt-4 italic">Lưu ý: Nếu công thức toán học bị lỗi, hãy thử sao chép nội dung và dán vào một trình soạn thảo khác.</p>
                 </div>
             </main>
         </div>
@@ -123,6 +160,7 @@
             <p class="text-xs text-gray-500">Phát triển bởi Gemini</p>
         </footer>
     </div>
+    <div id="toast-notification" class="toast"></div>
 
     <script>
         // DOM Elements
@@ -132,35 +170,36 @@
         const loadingDiv = document.getElementById('loading');
         const resultContainer = document.getElementById('result-container');
         const resultDiv = document.getElementById('result');
-        const inputContainer = document.getElementById('input-container');
-        const imagePreviewContainer = document.getElementById('image-preview-container');
+        const copyBtn = document.getElementById('copy-btn');
+        const toast = document.getElementById('toast-notification');
 
-        let imageBase64Data = null;
+        let lastRawResponse = ''; // Variable to store the raw API response
 
         // --- Image Handling ---
 
         const displayImagePreview = (file) => {
             const reader = new FileReader();
             reader.onload = (e) => {
-                imageBase64Data = e.target.result.split(',')[1]; // Get base64 part
-                imagePreviewContainer.innerHTML = `
+                const imageBase64Data = e.target.result.split(',')[1];
+                window.imageBase64Data = imageBase64Data;
+                document.getElementById('image-preview-container').innerHTML = `
                     <div class="image-preview">
                         <img src="${e.target.result}" alt="Xem trước ảnh">
                         <div class="remove-image-btn" onclick="removeImage()">×</div>
                     </div>
                 `;
-                imagePreviewContainer.classList.remove('hidden');
-                questionInput.classList.add('hidden'); // Hide textarea when image is present
+                document.getElementById('image-preview-container').classList.remove('hidden');
+                questionInput.classList.add('hidden');
             };
             reader.readAsDataURL(file);
         };
 
-        const removeImage = () => {
-            imageBase64Data = null;
-            imageUpload.value = ''; // Reset file input
-            imagePreviewContainer.classList.add('hidden');
-            imagePreviewContainer.innerHTML = '';
-            questionInput.classList.remove('hidden'); // Show textarea again
+        window.removeImage = () => {
+            window.imageBase64Data = null;
+            imageUpload.value = '';
+            document.getElementById('image-preview-container').classList.add('hidden');
+            document.getElementById('image-preview-container').innerHTML = '';
+            questionInput.classList.remove('hidden');
         };
 
         imageUpload.addEventListener('change', (event) => {
@@ -181,10 +220,36 @@
                 }
             }
         });
+        
+        // --- Utility Functions ---
+        
+        const showToast = (message) => {
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        };
+
+        copyBtn.addEventListener('click', () => {
+            if (!lastRawResponse) return;
+            const textarea = document.createElement('textarea');
+            textarea.value = lastRawResponse;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast('Đã sao chép vào clipboard!');
+            } catch (err) {
+                showToast('Không thể sao chép.');
+                console.error('Copy failed', err);
+            }
+            document.body.removeChild(textarea);
+        });
 
         // --- API Call Logic ---
 
-        const callGeminiAPI = async (prompt, imageData = null) => {
+        const callGeminiAPI = async (prompt) => {
             loadingDiv.classList.remove('hidden');
             resultContainer.classList.add('hidden');
             submitBtn.disabled = true;
@@ -193,19 +258,7 @@
             const apiKey = ""; // API key will be injected by the environment
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
-            let parts = [{ text: prompt }];
-            if (imageData) {
-                parts.push({
-                    inlineData: {
-                        mimeType: "image/png",
-                        data: imageData
-                    }
-                });
-            }
-
-            const payload = {
-                contents: [{ role: "user", parts: parts }]
-            };
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
             
             try {
                 const response = await fetch(apiUrl, {
@@ -215,24 +268,27 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error(`API Error: ${response.statusText}`);
+                    const errorBody = await response.text();
+                    throw new Error(`API Error: ${response.statusText}. Details: ${errorBody}`);
                 }
 
                 const result = await response.json();
                 
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
+                if (result.candidates && result.candidates[0]?.content?.parts?.[0]?.text) {
                     const text = result.candidates[0].content.parts[0].text;
                     displayResult(text);
                 } else {
-                    displayResult("Xin lỗi, tôi không thể tạo ra câu trả lời vào lúc này. Vui lòng thử lại sau.");
-                    console.error("Unexpected API response structure:", result);
+                    let errorMessage = "Xin lỗi, tôi không thể tạo ra câu trả lời vào lúc này.";
+                    if (result.promptFeedback?.blockReason) {
+                        errorMessage += ` (Lý do: ${result.promptFeedback.blockReason})`;
+                    }
+                    displayResult(errorMessage);
+                    console.error("API response error:", result);
                 }
 
             } catch (error) {
                 console.error('Error calling Gemini API:', error);
-                displayResult(`Đã có lỗi xảy ra: ${error.message}. Vui lòng kiểm tra lại và thử lại.`);
+                displayResult(`Đã có lỗi xảy ra: ${error.message}.`);
             } finally {
                 loadingDiv.classList.add('hidden');
                 submitBtn.disabled = false;
@@ -243,14 +299,14 @@
         // --- Display Logic ---
 
         const displayResult = (text) => {
-            // Use marked.js to convert Markdown to HTML
+            lastRawResponse = text; // Store raw text for copy functionality
             resultDiv.innerHTML = marked.parse(text);
             resultContainer.classList.remove('hidden');
             
-            // Re-render MathJax for the new content
             if (window.MathJax) {
-                MathJax.typesetPromise([resultDiv]).catch(function (err) {
+                MathJax.typesetPromise([resultDiv]).catch((err) => {
                     console.error('MathJax typesetting error: ' + err.message);
+                    // The error message is already displayed by MathJax in the div
                 });
             }
         };
@@ -259,37 +315,36 @@
 
         submitBtn.addEventListener('click', async () => {
             const questionText = questionInput.value.trim();
+            const imageData = window.imageBase64Data;
 
-            if (!questionText && !imageBase64Data) {
+            if (!questionText && !imageData) {
                 alert('Vui lòng nhập câu hỏi hoặc tải lên hình ảnh.');
                 return;
             }
 
-            let prompt = "";
-            let textFromImage = "";
+            loadingDiv.classList.remove('hidden');
+            resultContainer.classList.add('hidden');
 
-            if (imageBase64Data) {
-                // Step 1: Extract text from image if there is one
-                loadingDiv.classList.remove('hidden');
-                resultContainer.classList.add('hidden');
-                
+            let combinedQuestion = questionText;
+
+            if (imageData) {
                 const ocrPrompt = "Trích xuất toàn bộ và chính xác văn bản từ hình ảnh này. Chỉ trả về nội dung văn bản, không thêm bất kỳ lời giải thích nào.";
-                
-                try {
+                 try {
                     const ocrResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             contents: [{
-                                parts: [{ text: ocrPrompt }, { inlineData: { mimeType: "image/png", data: imageBase64Data } }]
+                                parts: [{ text: ocrPrompt }, { inlineData: { mimeType: "image/png", data: imageData } }]
                             }]
                         })
                     });
                     const ocrResult = await ocrResponse.json();
-                    if (ocrResult.candidates && ocrResult.candidates[0].content.parts[0].text) {
-                        textFromImage = ocrResult.candidates[0].content.parts[0].text;
+                    const textFromImage = ocrResult.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (textFromImage) {
+                        combinedQuestion = questionText ? `${questionText}\n\n[Nội dung từ ảnh]:\n${textFromImage}` : textFromImage;
                     } else {
-                        throw new Error("Không thể nhận diện văn bản từ ảnh.");
+                         throw new Error("Không thể nhận diện văn bản từ ảnh.");
                     }
                 } catch (e) {
                     displayResult(`Lỗi nhận diện hình ảnh: ${e.message}`);
@@ -298,20 +353,17 @@
                 }
             }
             
-            const combinedQuestion = questionText ? `${questionText}\n\n${textFromImage}`.trim() : textFromImage;
-
-            // Step 2: Send the question (from text or image) to the tutor AI
-            prompt = `Bạn là một Gia Sư AI chuyên nghiệp và thân thiện. Nhiệm vụ của bạn là giải đáp các câu hỏi học tập.
-1.  **Phân tích câu hỏi:** Dựa vào nội dung sau đây, hãy xác định môn học và ước tính lớp học phù hợp (ví dụ: Toán lớp 9, Vật Lý lớp 10, Ngữ Văn lớp 12).
-2.  **Trình bày lời giải:** Cung cấp câu trả lời chi tiết, từng bước một, dễ hiểu và khoa học. Sử dụng định dạng Markdown để trình bày rõ ràng (dùng tiêu đề, danh sách, in đậm, in nghiêng). Với các công thức toán học, hãy dùng định dạng LaTeX (ví dụ: $$x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}$$).
-3.  **Tóm tắt:** Cuối cùng, tóm tắt lại các điểm chính hoặc kiến thức cốt lõi.
+            const finalPrompt = `Bạn là một Gia Sư AI chuyên nghiệp và thân thiện. Nhiệm vụ của bạn là giải đáp các câu hỏi học tập.
+1.  **Phân tích câu hỏi:** Dựa vào nội dung sau đây, hãy xác định môn học và ước tính lớp học phù hợp.
+2.  **Trình bày lời giải:** Cung cấp câu trả lời chi tiết, từng bước một, dễ hiểu và khoa học. Sử dụng định dạng Markdown. Với các công thức toán học, hãy dùng định dạng LaTeX. Hãy đặc biệt cẩn thận với cú pháp LaTeX, đảm bảo rằng các dấu ngoặc như '\\left(' và '\\right)' luôn đi theo cặp.
+3.  **Tóm tắt:** Cuối cùng, tóm tắt lại các điểm chính.
 
 Đây là câu hỏi cần giải đáp:
 ---
 ${combinedQuestion}
 ---`;
 
-            callGeminiAPI(prompt);
+            callGeminiAPI(finalPrompt);
         });
 
     </script>
