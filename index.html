@@ -3,369 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Giáo Viên AI - Trợ Lý Học Tập</title>
+    <title>Gia Sư AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script>
-        MathJax = {
-          tex: {
-            inlineMath: [['$', '$'], ['\\(', '\\)']],
-            displayMath: [['$$', '$$'], ['\\[', '\\]']]
-          },
-          svg: {
-            fontCache: 'global'
-          }
-        };
-    </script>
-    <script type="text/javascript" id="MathJax-script" async
-        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
-    </script>
-    <!-- Chosen Palette: Friendly Academia (with Dark Mode) -->
-    <!-- Application Structure Plan: The core structure remains a task-oriented single page app. The key improvement is the addition of automatic dark mode detection based on system preferences. This enhances usability and visual comfort on mobile devices without altering the primary workflow. The UI now adapts to the user's environment. -->
-    <!-- Visualization & Content Choices: The interactions remain the same. The main change is the visual presentation, which now has a corresponding dark theme for every component, ensuring a consistent and accessible experience in both light and dark modes. This is achieved via Tailwind's `dark:` variants and a small JS snippet. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         body {
-            font-family: 'Noto Sans', sans-serif;
-            transition: background-color 0.3s, color 0.3s;
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+        }
+        .prose {
+            color: #333;
+        }
+        .prose h1, .prose h2, .prose h3 {
+            color: #1a202c;
+        }
+        .prose p, .prose ul, .prose ol {
+            line-height: 1.7;
+        }
+        .prose code {
+            background-color: #e2e8f0;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .prose pre {
+            background-color: #1a202c;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
         }
         .loader {
             border: 4px solid #f3f3f3;
-            border-top: 4px solid #3B82F6;
+            border-top: 4px solid #3498db;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        #image-upload-input {
-            display: none;
+        .image-preview {
+            position: relative;
+            max-width: 100%;
+            max-height: 300px;
+            overflow: hidden;
+            border-radius: 0.5rem;
         }
-        .custom-file-upload {
+        .image-preview img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+        .remove-image-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: rgba(0,0,0,0.6);
+            color: white;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-        }
-        @media (max-width: 767px) {
-            html {
-                font-size: 50%;
-            }
-        }
-        /* Cập nhật: Thêm style cho nội dung trong modal để trình bày khoa học hơn */
-        #modal-body h3 {
-            font-size: 1.125rem; /* text-lg */
-            font-weight: 700;
-            margin-top: 1.25rem;
-            margin-bottom: 0.75rem;
-            color: #1d4ed8; /* blue-700 */
-            border-bottom: 1px solid #e5e7eb; /* gray-200 */
-            padding-bottom: 0.25rem;
-        }
-        .dark #modal-body h3 {
-            color: #60a5fa; /* blue-400 */
-            border-bottom-color: #4b5563; /* gray-600 */
-        }
-        #modal-body ul {
-            list-style-type: disc;
-            padding-left: 1.75rem;
-            margin-bottom: 1rem;
-        }
-        #modal-body li {
-            margin-bottom: 0.5rem;
-            line-height: 1.6;
-        }
-        #modal-body p {
-            margin-bottom: 1rem;
-            line-height: 1.6;
-        }
-        .disclaimer {
-            margin-top: 2rem;
-            padding-top: 1rem;
-            border-top: 1px solid #e5e7eb;
-            font-size: 0.875rem;
-            color: #64748b;
-            font-style: italic;
-        }
-        .dark .disclaimer {
-            border-top-color: #4b5563;
-            color: #94a3b8;
+            font-weight: bold;
+            line-height: 1;
         }
     </style>
-    <script>
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-          document.documentElement.classList.add('dark')
-        } else {
-          document.documentElement.classList.remove('dark')
-        }
-    </script>
 </head>
-<body class="antialiased bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-300">
-
-    <main class="container mx-auto p-4 md:p-6 max-w-4xl">
-
-        <header class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-blue-700 dark:text-blue-400">Giáo Viên AI</h1>
-            <p class="text-slate-500 dark:text-slate-400 mt-2">Trợ lý học tập thông minh của bạn</p>
-        </header>
-
-        <!-- Control Panel -->
-        <section id="control-panel" class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-lg mb-8">
-            <!-- Text Input -->
-            <div class="mb-4">
-                <label for="question-input" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nhập câu hỏi của bạn:</label>
-                <textarea id="question-input" rows="3" class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Ví dụ: Giải phương trình x^2 - 5x + 6 = 0"></textarea>
-            </div>
-
-            <!-- Image Input -->
-            <div class="mb-4">
-                 <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Hoặc đính kèm hình ảnh bài tập:</label>
-                <div id="image-drop-zone" class="relative w-full p-6 text-center rounded-lg border-2 border-dashed border-slate-300 dark:border-slate-600 hover:border-blue-500 dark:hover:border-blue-500 transition-colors">
-                    <div id="image-preview-container" class="hidden mb-4">
-                        <img id="image-preview" src="" alt="Xem trước ảnh" class="max-h-48 mx-auto rounded-lg"/>
-                        <button id="remove-image-btn" class="mt-2 text-red-500 hover:text-red-700 text-sm">Xóa ảnh</button>
-                    </div>
-                    <div id="upload-instructions">
-                        <i class="fas fa-cloud-upload-alt text-3xl text-blue-400"></i>
-                        <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Kéo & thả, dán, hoặc nhấn để chọn ảnh</p>
-                    </div>
-                </div>
-                <input type="file" id="image-upload-input" accept="image/*">
-                <div class="flex justify-center items-center space-x-4 mt-3">
-                    <label for="image-upload-input" class="custom-file-upload bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-medium py-2 px-4 rounded-lg transition-colors duration-200">
-                        <i class="fas fa-upload mr-2"></i>Tải ảnh lên
-                    </label>
-                    <button id="capture-btn" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-medium py-2 px-4 rounded-lg transition-colors duration-200">
-                        <i class="fas fa-camera mr-2"></i>Chụp ảnh
-                    </button>
-                </div>
-            </div>
-
-            <!-- Submit Button -->
-            <button id="submit-btn" class="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center">
-                <span id="submit-btn-text">Gửi câu hỏi</span>
-                <div id="submit-loader" class="loader hidden"></div>
-            </button>
-        </section>
-
-        <!-- Conversation Area -->
-        <section id="conversation-area">
-            <div id="conversation-container" class="space-y-6">
-                <!-- Chat messages will be appended here -->
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Modal -->
-    <div id="response-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-50">
-        <div id="modal-content" class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col">
-            <header class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
-                <h2 class="text-lg font-bold text-blue-700 dark:text-blue-400">Câu Trả Lời từ Giáo Viên AI</h2>
-                <button id="close-modal-btn" class="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 text-2xl">&times;</button>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="w-full max-w-2xl mx-auto p-4 md:p-6">
+        <div class="bg-white rounded-xl shadow-lg">
+            <!-- Header -->
+            <header class="text-center p-6 border-b border-gray-200">
+                <h1 class="text-3xl font-bold text-gray-800">Gia Sư AI 🧠</h1>
+                <p class="text-gray-500 mt-2">Trợ lý học tập thông minh của bạn</p>
             </header>
-            <div id="modal-body" class="p-6 overflow-y-auto">
-                <!-- AI response will be injected here -->
-            </div>
+
+            <!-- Input Area -->
+            <main class="p-6">
+                <div id="input-container">
+                    <label for="question-input" class="block text-sm font-medium text-gray-700 mb-2">Nhập câu hỏi hoặc dán hình ảnh vào đây:</label>
+                    <textarea id="question-input" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Ví dụ: Giải phương trình x^2 - 5x + 6 = 0"></textarea>
+
+                    <div id="image-preview-container" class="mt-4 hidden"></div>
+
+                    <div class="mt-4 flex flex-col sm:flex-row items-center gap-3">
+                        <label for="image-upload" class="w-full sm:w-auto cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg text-center transition">
+                            📷 Tải ảnh lên
+                        </label>
+                        <input type="file" id="image-upload" class="hidden" accept="image/*">
+                        
+                        <button id="submit-btn" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md">
+                            Gửi
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading and Result Area -->
+                <div id="loading" class="text-center py-10 hidden">
+                    <div class="loader mx-auto"></div>
+                    <p class="mt-4 text-gray-600">Gia Sư AI đang suy nghĩ...</p>
+                </div>
+
+                <div id="result-container" class="mt-6 hidden">
+                     <h2 class="text-2xl font-bold text-gray-800 border-b pb-3 mb-4">Hướng dẫn giải bài tập</h2>
+                    <div id="result" class="prose max-w-none"></div>
+                </div>
+            </main>
         </div>
+        <footer class="text-center mt-4">
+            <p class="text-xs text-gray-500">Phát triển bởi Gemini</p>
+        </footer>
     </div>
 
-
     <script>
-        // --- Theme Management ---
-        const themeMatcher = window.matchMedia('(prefers-color-scheme: dark)');
-        themeMatcher.addEventListener('change', e => {
-            if (e.matches) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-        });
-
-        // --- Element References ---
+        // DOM Elements
         const questionInput = document.getElementById('question-input');
-        const imageDropZone = document.getElementById('image-drop-zone');
-        const imageUploadInput = document.getElementById('image-upload-input');
-        const captureBtn = document.getElementById('capture-btn');
-        const imagePreviewContainer = document.getElementById('image-preview-container');
-        const imagePreview = document.getElementById('image-preview');
-        const uploadInstructions = document.getElementById('upload-instructions');
-        const removeImageBtn = document.getElementById('remove-image-btn');
+        const imageUpload = document.getElementById('image-upload');
         const submitBtn = document.getElementById('submit-btn');
-        const submitBtnText = document.getElementById('submit-btn-text');
-        const submitLoader = document.getElementById('submit-loader');
-        const conversationContainer = document.getElementById('conversation-container');
-        const responseModal = document.getElementById('response-modal');
-        const modalBody = document.getElementById('modal-body');
-        const closeModalBtn = document.getElementById('close-modal-btn');
+        const loadingDiv = document.getElementById('loading');
+        const resultContainer = document.getElementById('result-container');
+        const resultDiv = document.getElementById('result');
+        const inputContainer = document.getElementById('input-container');
+        const imagePreviewContainer = document.getElementById('image-preview-container');
 
-
-        let imageBase64 = null;
+        let imageBase64Data = null;
 
         // --- Image Handling ---
-        function handleImageFile(file) {
-            if (file && file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    imageBase64 = e.target.result.split(',')[1];
-                    imagePreview.src = e.target.result;
-                    imagePreviewContainer.classList.remove('hidden');
-                    uploadInstructions.classList.add('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-        
-        function removeImage() {
-            imageBase64 = null;
-            imagePreview.src = '';
+
+        const displayImagePreview = (file) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imageBase64Data = e.target.result.split(',')[1]; // Get base64 part
+                imagePreviewContainer.innerHTML = `
+                    <div class="image-preview">
+                        <img src="${e.target.result}" alt="Xem trước ảnh">
+                        <div class="remove-image-btn" onclick="removeImage()">×</div>
+                    </div>
+                `;
+                imagePreviewContainer.classList.remove('hidden');
+                questionInput.classList.add('hidden'); // Hide textarea when image is present
+            };
+            reader.readAsDataURL(file);
+        };
+
+        const removeImage = () => {
+            imageBase64Data = null;
+            imageUpload.value = ''; // Reset file input
             imagePreviewContainer.classList.add('hidden');
-            uploadInstructions.classList.remove('hidden');
-            imageUploadInput.value = '';
-        }
+            imagePreviewContainer.innerHTML = '';
+            questionInput.classList.remove('hidden'); // Show textarea again
+        };
 
-        imageUploadInput.addEventListener('change', (e) => handleImageFile(e.target.files[0]));
-        captureBtn.addEventListener('click', () => {
-            imageUploadInput.setAttribute('capture', 'environment');
-            imageUploadInput.click();
+        imageUpload.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                displayImagePreview(file);
+            }
         });
-        removeImageBtn.addEventListener('click', removeImage);
 
-        imageDropZone.addEventListener('dragover', (e) => { e.preventDefault(); imageDropZone.classList.add('border-blue-500'); });
-        imageDropZone.addEventListener('dragleave', () => imageDropZone.classList.remove('border-blue-500'));
-        imageDropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            imageDropZone.classList.remove('border-blue-500');
-            handleImageFile(e.dataTransfer.files[0]);
-        });
-        
-        document.addEventListener('paste', (e) => {
-            const items = e.clipboardData.items;
+        document.addEventListener('paste', (event) => {
+            const items = (event.clipboardData || window.clipboardData).items;
             for (const item of items) {
                 if (item.type.indexOf('image') !== -1) {
-                    handleImageFile(item.getAsFile());
+                    const file = item.getAsFile();
+                    displayImagePreview(file);
+                    event.preventDefault();
                     break;
                 }
             }
         });
 
-        // --- UI & Chat Display ---
-        function displayUserQuestion(text, imageSrc) {
-            const messageWrapper = document.createElement('div');
-            messageWrapper.className = `flex justify-end`;
+        // --- API Call Logic ---
 
-            const messageBubble = document.createElement('div');
-            const userBubbleClasses = 'bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-200 rounded-br-lg';
-            messageBubble.className = `max-w-[85%] p-4 rounded-2xl shadow-sm ${userBubbleClasses}`;
-            
-            const container = document.createElement('div');
-            if (imageSrc) {
-                const img = document.createElement('img');
-                img.src = imageSrc;
-                img.className = 'max-w-xs rounded-lg mb-2';
-                container.appendChild(img);
-            }
-            if (text) {
-                const p = document.createElement('p');
-                p.textContent = text;
-                container.appendChild(p);
-            }
-            messageBubble.appendChild(container);
-            messageWrapper.appendChild(messageBubble);
-            conversationContainer.appendChild(messageWrapper);
-            messageWrapper.scrollIntoView({ behavior: 'smooth' });
-        }
+        const callGeminiAPI = async (prompt, imageData = null) => {
+            loadingDiv.classList.remove('hidden');
+            resultContainer.classList.add('hidden');
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
 
-        // Cập nhật: Hàm chuyển đổi Markdown sang HTML được viết lại hoàn toàn để xử lý ngắt dòng chính xác.
-        function structuredMarkdownToHtml(text) {
-            // Thay thế các định dạng markdown cơ bản trước
-            let processedText = text
-                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>');
+            const apiKey = ""; // API key will be injected by the environment
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
-            // Chia thành các khối dựa trên dòng trống
-            const blocks = processedText.split(/\n\s*\n/);
-            
-            return blocks.map(block => {
-                const trimmedBlock = block.trim();
-                if (!trimmedBlock) return '';
-
-                // Xử lý danh sách
-                if (trimmedBlock.startsWith('* ')) {
-                    let listHtml = '<ul>';
-                    const items = trimmedBlock.split('\n');
-                    for (const item of items) {
-                        if (item.trim().startsWith('* ')) {
-                             listHtml += `<li>${item.trim().substring(2)}</li>`;
-                        }
+            let parts = [{ text: prompt }];
+            if (imageData) {
+                parts.push({
+                    inlineData: {
+                        mimeType: "image/png",
+                        data: imageData
                     }
-                    listHtml += '</ul>';
-                    return listHtml;
-                }
-                
-                // Xử lý các đoạn văn bản khác, thay thế xuống dòng đơn bằng <br>
-                return `<p>${trimmedBlock.replace(/\n/g, '<br>')}</p>`;
-            }).join('');
-        }
-
-
-        function displayAiResponseInModal(content) {
-            // Cập nhật: Thêm disclaimer vào cuối nội dung
-            const disclaimer = "Gemini có thể mắc sai sót, vì vậy, hãy xác minh các câu trả lời của Gemini.";
-            const mainContent = structuredMarkdownToHtml(content);
-            const disclaimerHtml = `<div class="disclaimer">${disclaimer}</div>`;
-            
-            modalBody.innerHTML = mainContent + disclaimerHtml;
-
-            if (typeof MathJax !== 'undefined') {
-                MathJax.typesetPromise([modalBody]).catch(function (err) {
-                    console.log('MathJax error: ' + err.message);
                 });
             }
 
-            responseModal.classList.remove('hidden');
-            responseModal.classList.add('flex');
-        }
-
-        function closeModal() {
-            responseModal.classList.add('hidden');
-            responseModal.classList.remove('flex');
-            modalBody.innerHTML = '';
-        }
-
-        closeModalBtn.addEventListener('click', closeModal);
-        responseModal.addEventListener('click', (e) => {
-            if (e.target === responseModal) {
-                closeModal();
-            }
-        });
-
-
-        function setLoading(isLoading) {
-            if (isLoading) {
-                submitBtn.disabled = true;
-                submitBtnText.classList.add('hidden');
-                submitLoader.classList.remove('hidden');
-            } else {
-                submitBtn.disabled = false;
-                submitBtnText.classList.remove('hidden');
-                submitLoader.classList.add('hidden');
-            }
-        }
-
-        // --- API Call ---
-        async function getAiResponse(prompt, base64ImageData) {
-            const apiKey = "AIzaSyBDL6rF1BEZy9FrZfhUL2hxFF_u0vSEFyw";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-            let parts = [{ text: prompt }];
-            if (base64ImageData) {
-                parts.push({ inlineData: { mimeType: "image/png", data: base64ImageData } });
-            }
-            const payload = { contents: [{ role: "user", parts: parts }] };
+            const payload = {
+                contents: [{ role: "user", parts: parts }]
+            };
             
             try {
                 const response = await fetch(apiUrl, {
@@ -373,58 +213,107 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                if (!response.ok) {
-                    const errorBody = await response.json();
-                    console.error("API Error:", errorBody);
-                    return `Đã có lỗi xảy ra: ${errorBody.error?.message || 'Không thể kết nối tới máy chủ.'}`;
-                }
-                const result = await response.json();
-                if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
-                    return result.candidates[0].content.parts[0].text;
-                } else {
-                    console.error("Unexpected API response structure:", result);
-                    return "Xin lỗi, tôi không thể xử lý câu trả lời lúc này.";
-                }
-            } catch (error) {
-                console.error("Fetch Error:", error);
-                return "Lỗi mạng. Vui lòng kiểm tra kết nối và thử lại.";
-            }
-        }
 
-        // --- Main Logic ---
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    displayResult(text);
+                } else {
+                    displayResult("Xin lỗi, tôi không thể tạo ra câu trả lời vào lúc này. Vui lòng thử lại sau.");
+                    console.error("Unexpected API response structure:", result);
+                }
+
+            } catch (error) {
+                console.error('Error calling Gemini API:', error);
+                displayResult(`Đã có lỗi xảy ra: ${error.message}. Vui lòng kiểm tra lại và thử lại.`);
+            } finally {
+                loadingDiv.classList.add('hidden');
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        };
+
+        // --- Display Logic ---
+
+        const displayResult = (text) => {
+            // Use marked.js to convert Markdown to HTML
+            resultDiv.innerHTML = marked.parse(text);
+            resultContainer.classList.remove('hidden');
+            
+            // Re-render MathJax for the new content
+            if (window.MathJax) {
+                MathJax.typesetPromise([resultDiv]).catch(function (err) {
+                    console.error('MathJax typesetting error: ' + err.message);
+                });
+            }
+        };
+
+        // --- Main Event Listener ---
+
         submitBtn.addEventListener('click', async () => {
             const questionText = questionInput.value.trim();
-            if (!questionText && !imageBase64) {
-                alert("Vui lòng nhập câu hỏi hoặc đính kèm hình ảnh.");
+
+            if (!questionText && !imageBase64Data) {
+                alert('Vui lòng nhập câu hỏi hoặc tải lên hình ảnh.');
                 return;
             }
 
-            setLoading(true);
-            displayUserQuestion(questionText, imageBase64 ? `data:image/png;base64,${imageBase64}` : null);
+            let prompt = "";
+            let textFromImage = "";
+
+            if (imageBase64Data) {
+                // Step 1: Extract text from image if there is one
+                loadingDiv.classList.remove('hidden');
+                resultContainer.classList.add('hidden');
+                
+                const ocrPrompt = "Trích xuất toàn bộ và chính xác văn bản từ hình ảnh này. Chỉ trả về nội dung văn bản, không thêm bất kỳ lời giải thích nào.";
+                
+                try {
+                    const ocrResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [{ text: ocrPrompt }, { inlineData: { mimeType: "image/png", data: imageBase64Data } }]
+                            }]
+                        })
+                    });
+                    const ocrResult = await ocrResponse.json();
+                    if (ocrResult.candidates && ocrResult.candidates[0].content.parts[0].text) {
+                        textFromImage = ocrResult.candidates[0].content.parts[0].text;
+                    } else {
+                        throw new Error("Không thể nhận diện văn bản từ ảnh.");
+                    }
+                } catch (e) {
+                    displayResult(`Lỗi nhận diện hình ảnh: ${e.message}`);
+                    loadingDiv.classList.add('hidden');
+                    return;
+                }
+            }
             
-            const prompt = `Bạn là một giáo viên AI chuyên gia, thân thiện và kiên nhẫn. Nhiệm vụ của bạn là:
-1. **Tự động xác định lớp học phù hợp nhất** cho câu hỏi được đưa ra.
-2. **Trình bày câu trả lời một cách khoa học và có cấu trúc rõ ràng.** Sử dụng markdown để định dạng:
-    - Dùng '### ' (có dấu cách) cho các đề mục chính (ví dụ: ### Phân tích đề bài).
-    - Dùng '* ' (có dấu cách) cho các gạch đầu dòng trong danh sách.
-    - Dùng '**' để in đậm các khái niệm hoặc kết quả quan trọng.
-    - **Quan trọng: Luôn sử dụng một dòng trống để phân tách các đoạn văn, đề mục và khối danh sách.**
-    - **Cực kỳ quan trọng: KHÔNG được ngắt dòng một cách tùy tiện ở giữa câu, công thức hay một mục trong danh sách. Mỗi ý, mỗi công thức, mỗi gạch đầu dòng phải nằm trên một dòng hoàn chỉnh.**
-3. **Quan trọng: Sử dụng định dạng LaTeX cho TẤT CẢ các công thức, ký hiệu và biến số toán học.** Dùng $...$ cho công thức inline và $$...$$ cho công thức trên dòng riêng.
-4. **Bắt đầu câu trả lời của bạn bằng cách nêu rõ lớp học bạn đã xác định**, ví dụ: "**Dành cho học sinh Lớp 9:** Chào em, đây là một câu hỏi thú vị về..."
-5. Giải thích một cách rõ ràng, từng bước, phù hợp với trình độ của lớp đã xác định.
-6. Nếu đây là một bài toán, hãy cố gắng đưa ra nhiều cách giải khác nhau (nếu có thể) và giải thích ưu nhược điểm của mỗi cách.
-7. Luôn giữ giọng văn tích cực và khuyến khích.
+            const combinedQuestion = questionText ? `${questionText}\n\n${textFromImage}`.trim() : textFromImage;
 
-Câu hỏi cần trả lời: "${questionText}"`;
+            // Step 2: Send the question (from text or image) to the tutor AI
+            prompt = `Bạn là một Gia Sư AI chuyên nghiệp và thân thiện. Nhiệm vụ của bạn là giải đáp các câu hỏi học tập.
+1.  **Phân tích câu hỏi:** Dựa vào nội dung sau đây, hãy xác định môn học và ước tính lớp học phù hợp (ví dụ: Toán lớp 9, Vật Lý lớp 10, Ngữ Văn lớp 12).
+2.  **Trình bày lời giải:** Cung cấp câu trả lời chi tiết, từng bước một, dễ hiểu và khoa học. Sử dụng định dạng Markdown để trình bày rõ ràng (dùng tiêu đề, danh sách, in đậm, in nghiêng). Với các công thức toán học, hãy dùng định dạng LaTeX (ví dụ: $$x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}$$).
+3.  **Tóm tắt:** Cuối cùng, tóm tắt lại các điểm chính hoặc kiến thức cốt lõi.
 
-            const aiResponse = await getAiResponse(prompt, imageBase64);
-            displayAiResponseInModal(aiResponse);
+Đây là câu hỏi cần giải đáp:
+---
+${combinedQuestion}
+---`;
 
-            questionInput.value = '';
-            removeImage();
-            setLoading(false);
+            callGeminiAPI(prompt);
         });
+
     </script>
 </body>
 </html>
