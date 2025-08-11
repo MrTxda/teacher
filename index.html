@@ -3,54 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gia Sư AI</title>
+    <title>Gia Sư AI - Trợ lý học tập thông minh</title>
+    
+    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts for better typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&family=Noto+Sans:wght@400;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     
-    <!-- Bổ sung cấu hình MathJax để nhận diện công thức LaTeX -->
-    <script>
-        window.MathJax = {
-          tex: {
-            inlineMath: [['$', '$'], ['\\(', '\\)']],
-            displayMath: [['$$', '$$'], ['\\[', '\\]']]
-          },
-          svg: {
-            fontCache: 'global'
-          }
-        };
-    </script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- KaTeX for rendering LaTeX math formulas -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" xintegrity="sha384-n8MVd4RsNIU07EWpWGbSbeHum6UiOP6masQDjdAMX59cavYghLXYJMYZGjNodkB7" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" xintegrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" xintegrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+    
+    <!-- Marked.js for rendering Markdown -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
     <style>
+        /* Custom styles and font families */
         body {
-            font-family: 'Noto Sans', sans-serif;
-            background-color: #f0f2f5;
+            font-family: 'Be Vietnam Pro', 'Noto Sans', sans-serif;
+            background-color: #f0f4f8;
         }
-        .prose {
-            color: #333;
+        h1, h2, h3 {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            font-weight: 700;
         }
-        .prose h1, .prose h2, .prose h3 {
-            color: #1a202c;
+        /* Style for the answer container */
+        #answer-container {
+            font-family: 'Noto Serif', serif;
+            line-height: 1.8;
+            color: #334155;
         }
-        .prose p, .prose ul, .prose ol {
-            line-height: 1.7;
-        }
-        .prose code {
+        #answer-container code {
             background-color: #e2e8f0;
-            padding: 2px 4px;
+            padding: 2px 6px;
             border-radius: 4px;
-            font-size: 0.9em;
+            font-family: monospace;
         }
-        .prose pre {
-            background-color: #1a202c;
-            color: #e2e8f0;
+        #answer-container pre {
+            background-color: #f1f5f9;
             padding: 1rem;
-            border-radius: 0.5rem;
+            border-radius: 8px;
             overflow-x: auto;
         }
+        #answer-container blockquote {
+            border-left: 4px solid #93c5fd;
+            padding-left: 1rem;
+            margin-left: 0;
+            font-style: italic;
+            color: #64748b;
+        }
+        /* KaTeX font size adjustment */
+        .katex {
+            font-size: 1.1em !important;
+        }
+        /* Custom button styles */
+        .btn {
+            @apply px-4 py-2 rounded-lg font-semibold text-white transition-all duration-300 flex items-center justify-center gap-2 shadow-md;
+        }
+        .btn-primary {
+            @apply bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300;
+        }
+        .btn-secondary {
+            @apply bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:ring-gray-300;
+        }
+        /* Spinner animation */
         .loader {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #3498db;
@@ -63,204 +83,194 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .image-preview {
-            position: relative;
-            max-width: 100%;
-            max-height: 300px;
-            overflow: hidden;
-            border-radius: 0.5rem;
-        }
-        .image-preview img {
-            width: 100%;
-            height: auto;
-            object-fit: contain;
-        }
-        .remove-image-btn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background-color: rgba(0,0,0,0.6);
-            color: white;
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-weight: bold;
-            line-height: 1;
-        }
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #2d3748;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-        .toast.show {
-            opacity: 1;
-        }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-    <div class="w-full max-w-2xl mx-auto p-4 md:p-6">
-        <div class="bg-white rounded-xl shadow-lg">
-            <!-- Header -->
-            <header class="text-center p-6 border-b border-gray-200">
-                <h1 class="text-3xl font-bold text-gray-800">Gia Sư AI 🧠</h1>
-                <p class="text-gray-500 mt-2">Trợ lý học tập thông minh của bạn</p>
-            </header>
+<body class="bg-gray-50 text-gray-800">
 
-            <!-- Input Area -->
-            <main class="p-6">
-                <div id="input-container">
-                    <label for="question-input" class="block text-sm font-medium text-gray-700 mb-2">Nhập câu hỏi hoặc dán hình ảnh vào đây:</label>
-                    <textarea id="question-input" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Ví dụ: Tìm giá trị lớn nhất của hàm số y = sin(x) + 2"></textarea>
+    <div class="container mx-auto max-w-4xl p-4 sm:p-6 md:p-8">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-blue-700">Gia Sư AI</h1>
+            <p class="text-lg text-gray-600 mt-2">Trợ lý học tập thông minh cho mọi môn học</p>
+        </header>
 
-                    <div id="image-preview-container" class="mt-4 hidden"></div>
+        <!-- Main Content -->
+        <main class="bg-white p-6 rounded-2xl shadow-lg">
+            
+            <!-- Input Section -->
+            <div class="mb-6">
+                <label for="question-input" class="block mb-2 text-lg font-medium text-gray-700">Nhập câu hỏi của bạn:</label>
+                <textarea id="question-input" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow" placeholder="Ví dụ: Giải phương trình x^2 - 3x + 2 = 0 hoặc dán hình ảnh bài tập vào đây..."></textarea>
+            </div>
 
-                    <div class="mt-4 flex flex-col sm:flex-row items-center gap-3">
-                        <label for="image-upload" class="w-full sm:w-auto cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg text-center transition">
-                            📷 Tải ảnh lên
-                        </label>
-                        <input type="file" id="image-upload" class="hidden" accept="image/*">
-                        
-                        <button id="submit-btn" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-md">
-                            Giáo viên hướng dẫn
-                        </button>
+            <!-- Image Handling Section -->
+            <div class="mb-6">
+                <div id="image-preview-container" class="hidden w-full max-w-sm mx-auto p-4 border-2 border-dashed border-gray-300 rounded-lg text-center">
+                    <img id="image-preview" src="" alt="Xem trước ảnh" class="max-h-60 mx-auto rounded-md mb-2">
+                    <button id="remove-image-btn" class="text-sm text-red-500 hover:text-red-700">Xóa ảnh</button>
+                </div>
+                <input type="file" id="file-input" class="hidden" accept="image/*">
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
+                <div class="flex items-center gap-3">
+                    <button id="upload-btn" class="btn btn-secondary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Tải ảnh lên
+                    </button>
+                    <button id="camera-btn" class="btn btn-secondary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                        Chụp ảnh
+                    </button>
+                </div>
+                <button id="solve-btn" class="btn btn-primary w-full sm:w-auto">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+                    Hướng dẫn giải
+                </button>
+            </div>
+
+            <!-- Answer Section -->
+            <div id="answer-section" class="mt-6 border-t pt-6 border-gray-200">
+                <div id="loading-indicator" class="hidden flex flex-col items-center justify-center text-center text-gray-500">
+                    <div class="loader mb-4"></div>
+                    <p>Gia Sư AI đang suy nghĩ... Vui lòng chờ trong giây lát.</p>
+                </div>
+                <div id="error-message" class="hidden p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg"></div>
+                <div id="answer-container">
+                     <div class="text-center text-gray-400">
+                        <p>Câu trả lời chi tiết sẽ xuất hiện ở đây.</p>
+                        <p class="text-sm mt-1">Hãy nhập câu hỏi hoặc tải ảnh lên để bắt đầu.</p>
                     </div>
                 </div>
+            </div>
+        </main>
 
-                <!-- Loading and Result Area -->
-                <div id="loading" class="text-center py-10 hidden">
-                    <div class="loader mx-auto"></div>
-                    <p class="mt-4 text-gray-600">Gia Sư AI đang suy nghĩ...</p>
-                </div>
-
-                <div id="result-container" class="mt-6 hidden">
-                     <div class="flex justify-between items-center border-b pb-3 mb-4">
-                        <h2 class="text-2xl font-bold text-gray-800">Hướng dẫn giải bài tập</h2>
-                        <button id="copy-btn" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-1 px-3 rounded-lg transition">
-                            Sao chép
-                        </button>
-                     </div>
-                    <div id="result" class="prose max-w-none"></div>
-                    <p class="text-xs text-gray-500 mt-4 italic">Lưu ý: Nếu công thức toán học bị lỗi, hãy thử sao chép nội dung và dán vào một trình soạn thảo khác.</p>
-                </div>
-            </main>
-        </div>
-        <footer class="text-center mt-4">
-            <p class="text-xs text-gray-500">Phát triển bởi Gemini</p>
+        <!-- Footer -->
+        <footer class="text-center mt-8 text-sm text-gray-500">
+            <p>&copy; 2024 Gia Sư AI. Được phát triển bởi AI.</p>
         </footer>
     </div>
-    <div id="toast-notification" class="toast"></div>
 
     <script>
         // DOM Elements
         const questionInput = document.getElementById('question-input');
-        const imageUpload = document.getElementById('image-upload');
-        const submitBtn = document.getElementById('submit-btn');
-        const loadingDiv = document.getElementById('loading');
-        const resultContainer = document.getElementById('result-container');
-        const resultDiv = document.getElementById('result');
-        const copyBtn = document.getElementById('copy-btn');
-        const toast = document.getElementById('toast-notification');
+        const solveBtn = document.getElementById('solve-btn');
+        const uploadBtn = document.getElementById('upload-btn');
+        const cameraBtn = document.getElementById('camera-btn');
+        const fileInput = document.getElementById('file-input');
+        const imagePreviewContainer = document.getElementById('image-preview-container');
+        const imagePreview = document.getElementById('image-preview');
+        const removeImageBtn = document.getElementById('remove-image-btn');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const answerContainer = document.getElementById('answer-container');
+        const errorMessage = document.getElementById('error-message');
 
-        let lastRawResponse = ''; // Variable to store the raw API response
+        let imageData = null;
 
         // --- Image Handling ---
 
-        const displayImagePreview = (file) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const imageBase64Data = e.target.result.split(',')[1];
-                window.imageBase64Data = imageBase64Data;
-                document.getElementById('image-preview-container').innerHTML = `
-                    <div class="image-preview">
-                        <img src="${e.target.result}" alt="Xem trước ảnh">
-                        <div class="remove-image-btn" onclick="removeImage()">×</div>
-                    </div>
-                `;
-                document.getElementById('image-preview-container').classList.remove('hidden');
-                questionInput.classList.add('hidden');
-            };
-            reader.readAsDataURL(file);
+        // Function to handle file selection (upload or camera)
+        const handleImageFile = (file) => {
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imageData = e.target.result.split(',')[1]; // Get base64 data
+                    imagePreview.src = e.target.result;
+                    imagePreviewContainer.classList.remove('hidden');
+                    answerContainer.innerHTML = ''; // Clear initial message
+                };
+                reader.readAsDataURL(file);
+            }
         };
 
-        window.removeImage = () => {
-            window.imageBase64Data = null;
-            imageUpload.value = '';
-            document.getElementById('image-preview-container').classList.add('hidden');
-            document.getElementById('image-preview-container').innerHTML = '';
-            questionInput.classList.remove('hidden');
-        };
+        // Trigger file input for upload
+        uploadBtn.addEventListener('click', () => {
+            fileInput.removeAttribute('capture');
+            fileInput.click();
+        });
 
-        imageUpload.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                displayImagePreview(file);
+        // Trigger file input for camera
+        cameraBtn.addEventListener('click', () => {
+            fileInput.setAttribute('capture', 'environment');
+            fileInput.click();
+        });
+        
+        // Handle file selection
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                handleImageFile(e.target.files[0]);
             }
         });
 
-        document.addEventListener('paste', (event) => {
-            const items = (event.clipboardData || window.clipboardData).items;
+        // Handle image pasting
+        document.addEventListener('paste', (e) => {
+            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
             for (const item of items) {
-                if (item.type.indexOf('image') !== -1) {
+                if (item.kind === 'file' && item.type.startsWith('image/')) {
                     const file = item.getAsFile();
-                    displayImagePreview(file);
-                    event.preventDefault();
-                    break;
+                    handleImageFile(file);
+                    break; 
                 }
             }
         });
-        
-        // --- Utility Functions ---
-        
-        const showToast = (message) => {
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-        };
 
-        copyBtn.addEventListener('click', () => {
-            if (!lastRawResponse) return;
-            const textarea = document.createElement('textarea');
-            textarea.value = lastRawResponse;
-            document.body.appendChild(textarea);
-            textarea.select();
-            try {
-                document.execCommand('copy');
-                showToast('Đã sao chép vào clipboard!');
-            } catch (err) {
-                showToast('Không thể sao chép.');
-                console.error('Copy failed', err);
-            }
-            document.body.removeChild(textarea);
+        // Remove image
+        removeImageBtn.addEventListener('click', () => {
+            imageData = null;
+            imagePreview.src = '';
+            imagePreviewContainer.classList.add('hidden');
+            fileInput.value = ''; // Reset file input
         });
 
-        // --- API Call Logic ---
+        // --- API Call and Solution Handling ---
 
-        const callGeminiAPI = async (prompt) => {
-            loadingDiv.classList.remove('hidden');
-            resultContainer.classList.add('hidden');
-            submitBtn.disabled = true;
-            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        solveBtn.addEventListener('click', async () => {
+            const userText = questionInput.value.trim();
 
-            const apiKey = "AIzaSyAIXncJmv1e3PifIJ8lf8K4TTLfkrFOR5k"; // API key will be injected by the environment
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            if (!userText && !imageData) {
+                showError('Vui lòng nhập câu hỏi hoặc tải lên hình ảnh.');
+                return;
+            }
 
-            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
-            
+            // Show loading state
+            loadingIndicator.classList.remove('hidden');
+            answerContainer.innerHTML = '';
+            errorMessage.classList.add('hidden');
+            solveBtn.disabled = true;
+            solveBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
             try {
+                // Construct the prompt for the AI model
+                const prompt = `Bạn là một gia sư AI chuyên nghiệp, có thể giải đáp các câu hỏi thuộc mọi môn học từ lớp 1 đến lớp 12 và cả đại học.
+Nhiệm vụ của bạn là:
+1. Phân tích câu hỏi từ văn bản và/hoặc hình ảnh được cung cấp.
+2. **Tự động xác định môn học và lớp học** của câu hỏi một cách chính xác nhất có thể.
+3. Trình bày lời giải một cách chi tiết, từng bước, dễ hiểu, khoa học và trực quan.
+4. Sử dụng định dạng Markdown để trình bày câu trả lời. Đặc biệt, **sử dụng cú pháp LaTeX được bao bọc bởi $$ cho tất cả các công thức toán học, hóa học, vật lý** (ví dụ: $$x^2 + y^2 = z^2$$).
+5. Bắt đầu câu trả lời bằng việc nêu rõ môn học và lớp học bạn đã xác định. Ví dụ: "**Môn:** Toán - **Lớp:** 9". Nếu không chắc chắn, hãy ghi "Không xác định".
+6. Giữ giọng văn thân thiện, khuyến khích như một người gia sư thực thụ.
+
+Dưới đây là câu hỏi của người dùng:
+Văn bản: "${userText}"`;
+
+                const parts = [{ text: prompt }];
+                if (imageData) {
+                    parts.push({
+                        inlineData: {
+                            mimeType: 'image/png',
+                            data: imageData
+                        }
+                    });
+                }
+
+                const payload = {
+                    contents: [{ role: "user", parts: parts }]
+                };
+                
+                const apiKey = "AIzaSyACWW1mR0t1epof6pnZPwTFERAS2XKiSCA"; // API key will be provided by the environment
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -268,103 +278,50 @@
                 });
 
                 if (!response.ok) {
-                    const errorBody = await response.text();
-                    throw new Error(`API Error: ${response.statusText}. Details: ${errorBody}`);
+                    const errorData = await response.json();
+                    throw new Error(errorData.error?.message || 'Có lỗi xảy ra từ phía máy chủ.');
                 }
 
                 const result = await response.json();
                 
-                if (result.candidates && result.candidates[0]?.content?.parts?.[0]?.text) {
-                    const text = result.candidates[0].content.parts[0].text;
-                    displayResult(text);
+                if (result.candidates && result.candidates.length > 0) {
+                    const aiResponseText = result.candidates[0].content.parts[0].text;
+                    // Use marked to convert Markdown to HTML
+                    const htmlContent = marked.parse(aiResponseText);
+                    answerContainer.innerHTML = htmlContent;
+                    
+                    // Use KaTeX to render math formulas within the new content
+                    renderMathInElement(answerContainer, {
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '$', right: '$', display: false},
+                            {left: '\\(', right: '\\)', display: false},
+                            {left: '\\[', right: '\\]', display: true}
+                        ],
+                        throwOnError: false
+                    });
+
                 } else {
-                    let errorMessage = "Xin lỗi, tôi không thể tạo ra câu trả lời vào lúc này.";
-                    if (result.promptFeedback?.blockReason) {
-                        errorMessage += ` (Lý do: ${result.promptFeedback.blockReason})`;
-                    }
-                    displayResult(errorMessage);
-                    console.error("API response error:", result);
+                    showError('Không nhận được phản hồi hợp lệ từ AI. Vui lòng thử lại.');
                 }
 
             } catch (error) {
-                console.error('Error calling Gemini API:', error);
-                displayResult(`Đã có lỗi xảy ra: ${error.message}.`);
+                console.error('Error:', error);
+                showError(`Đã có lỗi xảy ra: ${error.message}`);
             } finally {
-                loadingDiv.classList.add('hidden');
-                submitBtn.disabled = false;
-                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                // Hide loading state and re-enable button
+                loadingIndicator.classList.add('hidden');
+                solveBtn.disabled = false;
+                solveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             }
-        };
-
-        // --- Display Logic ---
-
-        const displayResult = (text) => {
-            lastRawResponse = text; // Store raw text for copy functionality
-            resultDiv.innerHTML = marked.parse(text);
-            resultContainer.classList.remove('hidden');
-            
-            if (window.MathJax) {
-                MathJax.typesetPromise([resultDiv]).catch((err) => {
-                    console.error('MathJax typesetting error: ' + err.message);
-                    // The error message is already displayed by MathJax in the div
-                });
-            }
-        };
-
-        // --- Main Event Listener ---
-
-        submitBtn.addEventListener('click', async () => {
-            const questionText = questionInput.value.trim();
-            const imageData = window.imageBase64Data;
-
-            if (!questionText && !imageData) {
-                alert('Vui lòng nhập câu hỏi hoặc tải lên hình ảnh.');
-                return;
-            }
-
-            loadingDiv.classList.remove('hidden');
-            resultContainer.classList.add('hidden');
-
-            let combinedQuestion = questionText;
-
-            if (imageData) {
-                const ocrPrompt = "Trích xuất toàn bộ và chính xác văn bản từ hình ảnh này. Chỉ trả về nội dung văn bản, không thêm bất kỳ lời giải thích nào.";
-                 try {
-                    const ocrResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{
-                                parts: [{ text: ocrPrompt }, { inlineData: { mimeType: "image/png", data: imageData } }]
-                            }]
-                        })
-                    });
-                    const ocrResult = await ocrResponse.json();
-                    const textFromImage = ocrResult.candidates?.[0]?.content?.parts?.[0]?.text;
-                    if (textFromImage) {
-                        combinedQuestion = questionText ? `${questionText}\n\n[Nội dung từ ảnh]:\n${textFromImage}` : textFromImage;
-                    } else {
-                         throw new Error("Không thể nhận diện văn bản từ ảnh.");
-                    }
-                } catch (e) {
-                    displayResult(`Lỗi nhận diện hình ảnh: ${e.message}`);
-                    loadingDiv.classList.add('hidden');
-                    return;
-                }
-            }
-            
-            const finalPrompt = `Bạn là một Gia Sư AI chuyên nghiệp và thân thiện. Nhiệm vụ của bạn là giải đáp các câu hỏi học tập.
-1.  **Phân tích câu hỏi:** Dựa vào nội dung sau đây, hãy xác định môn học và ước tính lớp học phù hợp.
-2.  **Trình bày lời giải:** Cung cấp câu trả lời chi tiết, từng bước một, dễ hiểu và khoa học. Sử dụng định dạng Markdown. Với các công thức toán học, hãy dùng định dạng LaTeX. Hãy đặc biệt cẩn thận với cú pháp LaTeX, đảm bảo rằng các dấu ngoặc như '\\left(' và '\\right)' luôn đi theo cặp.
-3.  **Tóm tắt:** Cuối cùng, tóm tắt lại các điểm chính.
-
-Đây là câu hỏi cần giải đáp:
----
-${combinedQuestion}
----`;
-
-            callGeminiAPI(finalPrompt);
         });
+
+        // Function to display error messages
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+            answerContainer.innerHTML = ''; // Clear any previous answers
+        }
 
     </script>
 </body>
