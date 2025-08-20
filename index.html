@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gia Sư AI - Trợ lý học tập thông minh</title>
+    <title>Gia Sư AI</title>
     
     <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -25,55 +25,66 @@
         /* Custom styles and font families */
         body {
             font-family: 'Be Vietnam Pro', 'Noto Sans', sans-serif;
-            background-color: #f0f4f8;
+            background-color: #F8F4F0; /* Very light background color */
+            color: #4A4A4A;
+        }
+        body.font-literature {
+            font-family: 'Noto Serif', serif;
+        }
+        body.font-science {
+            font-family: 'Be Vietnam Pro', 'Noto Sans', sans-serif;
         }
         h1, h2, h3 {
             font-family: 'Be Vietnam Pro', sans-serif;
             font-weight: 700;
+            color: #B48D73; /* Light brown heading color */
         }
         /* Style for the answer container */
         #answer-container {
-            font-family: 'Noto Serif', serif;
+            font-family: inherit; /* Inherit font from body */
             line-height: 1.8;
-            color: #334155;
+            color: #4A4A4A;
         }
         #answer-container code {
-            background-color: #e2e8f0;
+            background-color: #EFEFEF;
             padding: 2px 6px;
             border-radius: 4px;
             font-family: monospace;
+            color: #727272;
         }
         #answer-container pre {
-            background-color: #f1f5f9;
+            background-color: #F0E8DE;
             padding: 1rem;
             border-radius: 8px;
             overflow-x: auto;
+            color: #4A4A4A;
         }
         #answer-container blockquote {
-            border-left: 4px solid #93c5fd;
+            border-left: 4px solid #B48D73;
             padding-left: 1rem;
             margin-left: 0;
             font-style: italic;
-            color: #64748b;
+            color: #727272;
         }
         /* KaTeX font size adjustment */
         .katex {
             font-size: 1.1em !important;
+            color: #4A4A4A !important;
         }
         /* Custom button styles */
         .btn {
             @apply px-4 py-2 rounded-lg font-semibold text-white transition-all duration-300 flex items-center justify-center gap-2 shadow-md;
         }
         .btn-primary {
-            @apply bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300;
+            @apply bg-[#B48D73] hover:bg-[#A37B63] focus:ring-4 focus:ring-[#D9C4B7] text-white;
         }
         .btn-secondary {
-            @apply bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:ring-gray-300;
+            @apply bg-gray-400 hover:bg-gray-500 focus:ring-4 focus:ring-gray-300;
         }
         /* Spinner animation */
         .loader {
             border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
+            border-top: 4px solid #B48D73;
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -85,13 +96,13 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-[#F8F4F0] text-[#4A4A4A]">
 
     <div class="container mx-auto max-w-4xl p-4 sm:p-6 md:p-8">
         <!-- Header -->
         <header class="text-center mb-8">
-            <h1 class="text-4xl md:text-5xl font-bold text-blue-700">Gia Sư AI</h1>
-            <p class="text-lg text-gray-600 mt-2">Trợ lý học tập thông minh cho mọi môn học</p>
+            <h1 class="text-4xl md:text-5xl font-bold text-[#B48D73]">Gia Sư AI</h1>
+            <p class="text-lg text-[#727272] mt-2">Trợ lý học tập thông minh cho mọi môn học</p>
         </header>
 
         <!-- Main Content -->
@@ -99,15 +110,15 @@
             
             <!-- Input Section -->
             <div class="mb-6">
-                <label for="question-input" class="block mb-2 text-lg font-medium text-gray-700">Nhập câu hỏi của bạn:</label>
-                <textarea id="question-input" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow" placeholder="Ví dụ: Giải phương trình x^2 - 3x + 2 = 0 hoặc dán hình ảnh bài tập vào đây..."></textarea>
+                <label for="question-input" class="block mb-2 text-lg font-medium text-[#727272]">Nhập câu hỏi của bạn:</label>
+                <textarea id="question-input" rows="4" class="w-full p-3 border border-[#D9C4B7] bg-white rounded-lg focus:ring-2 focus:ring-[#B48D73] focus:border-[#B48D73] transition-shadow text-[#4A4A4A]" placeholder="Ví dụ: Giải phương trình x^2 - 3x + 2 = 0 hoặc dán hình ảnh bài tập vào đây..."></textarea>
             </div>
 
             <!-- Image Handling Section -->
             <div class="mb-6">
-                <div id="image-preview-container" class="hidden w-full max-w-sm mx-auto p-4 border-2 border-dashed border-gray-300 rounded-lg text-center">
+                <div id="image-preview-container" class="hidden w-full max-w-sm mx-auto p-4 border-2 border-dashed border-[#D9C4B7] rounded-lg text-center">
                     <img id="image-preview" src="" alt="Xem trước ảnh" class="max-h-60 mx-auto rounded-md mb-2">
-                    <button id="remove-image-btn" class="text-sm text-red-500 hover:text-red-700">Xóa ảnh</button>
+                    <button id="remove-image-btn" class="text-sm text-red-600 hover:text-red-700">Xóa ảnh</button>
                 </div>
                 <input type="file" id="file-input" class="hidden" accept="image/*">
             </div>
@@ -116,29 +127,40 @@
             <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
                 <div class="flex items-center gap-3">
                     <button id="upload-btn" class="btn btn-secondary">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        <!-- Cute upload icon SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.165"/><path d="m16 16-3 3-3-3"/><path d="M13 19v-9"/></svg>
                         Tải ảnh lên
                     </button>
                     <button id="camera-btn" class="btn btn-secondary">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                        <!-- Cute camera icon SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><circle cx="12" cy="13" r="3.5"/><path d="M19.451 10.95c.29-.115.54-.27.76-.462A10 10 0 0 0 12.001 3C7.57 3 3.733 4.887 2.016 7.738"/><path d="M4.549 13.05c-.29.115-.54.27-.76.462A10 10 0 0 0 11.999 21c4.43 0 8.267-1.887 9.984-4.738"/><path d="M2.5 12h2.5"/><path d="M19 12h2.5"/></svg>
                         Chụp ảnh
                     </button>
                 </div>
                 <button id="solve-btn" class="btn btn-primary w-full sm:w-auto">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+                    <!-- Cute solve icon SVG -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M18.89 11.139a.5.5 0 0 1 .458.268l1.373 2.541a.5.5 0 0 1-.027.568l-3.324 3.793a.5.5 0 0 1-.72.062l-2.02-2.195a.5.5 0 0 1-.166-.356l.016-1.554a.5.5 0 0 1 .286-.45l3.96-1.928Z"/><path d="M3 13.882a.5.5 0 0 1 .238-.386L7.143 11a.5.5 0 0 1 .593.18L10 14"/><path d="M10 21H7.868a2 2 0 0 1-1.742-1.008L3 14.75"/><path d="M14 3h2.132a2 2 0 0 1 1.742 1.008L21 9.25"/></svg>
                     Hướng dẫn giải
+                </button>
+            </div>
+            
+            <!-- Gemini-powered features buttons -->
+            <div id="gemini-features" class="hidden flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
+                 <button id="related-stories-btn" class="btn btn-primary w-full sm:w-auto">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M9 13a5 5 0 0 0 7.54.54l3.5-3.5a5 5 0 0 0-7.07-7.07L9.54 8.54a5 5 0 0 0-.54 7.54"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3.5 3.5a5 5 0 0 0 7.07 7.07l1.46-1.46"/></svg>
+                    ✨ Câu chuyện thú vị
                 </button>
             </div>
 
             <!-- Answer Section -->
-            <div id="answer-section" class="mt-6 border-t pt-6 border-gray-200">
-                <div id="loading-indicator" class="hidden flex flex-col items-center justify-center text-center text-gray-500">
+            <div id="answer-section" class="mt-6 border-t pt-6 border-[#D9C4B7]">
+                <div id="loading-indicator" class="hidden flex flex-col items-center justify-center text-center text-[#727272]">
                     <div class="loader mb-4"></div>
                     <p>Gia Sư AI đang suy nghĩ... Vui lòng chờ trong giây lát.</p>
                 </div>
-                <div id="error-message" class="hidden p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg"></div>
+                <div id="error-message" class="hidden p-4 bg-red-900 border border-red-700 text-red-300 rounded-lg"></div>
                 <div id="answer-container">
-                     <div class="text-center text-gray-400">
+                     <div class="text-center text-[#D9C4B7]">
                         <p>Câu trả lời chi tiết sẽ xuất hiện ở đây.</p>
                         <p class="text-sm mt-1">Hãy nhập câu hỏi hoặc tải ảnh lên để bắt đầu.</p>
                     </div>
@@ -147,7 +169,7 @@
         </main>
 
         <!-- Footer -->
-        <footer class="text-center mt-8 text-sm text-gray-500">
+        <footer class="text-center mt-8 text-sm text-[#727272]">
             <p>&copy; 2024 Gia Sư AI. Được phát triển bởi AI.</p>
         </footer>
     </div>
@@ -165,20 +187,24 @@
         const loadingIndicator = document.getElementById('loading-indicator');
         const answerContainer = document.getElementById('answer-container');
         const errorMessage = document.getElementById('error-message');
+        const geminiFeatures = document.getElementById('gemini-features');
+        const relatedStoriesBtn = document.getElementById('related-stories-btn');
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=`;
+        const apiKey = "AIzaSyACWW1mR0t1epof6pnZPwTFERAS2XKiSCA";
 
         let imageData = null;
-
-        // --- Image Handling ---
+        let lastQuestionText = "";
+        let lastAnswerText = "";
 
         // Function to handle file selection (upload or camera)
         const handleImageFile = (file) => {
             if (file && file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    imageData = e.target.result.split(',')[1]; // Get base64 data
+                    imageData = e.target.result.split(',')[1];
                     imagePreview.src = e.target.result;
                     imagePreviewContainer.classList.remove('hidden');
-                    answerContainer.innerHTML = ''; // Clear initial message
+                    answerContainer.innerHTML = '';
                 };
                 reader.readAsDataURL(file);
             }
@@ -220,36 +246,60 @@
             imageData = null;
             imagePreview.src = '';
             imagePreviewContainer.classList.add('hidden');
-            fileInput.value = ''; // Reset file input
+            fileInput.value = '';
         });
 
+        // Function to determine font based on detected subject
+        function setFontBasedOnSubject(subject) {
+            const body = document.body;
+            body.className = '';
+            if (subject.includes("Văn học")) {
+                body.classList.add('font-literature');
+            } else if (subject.includes("Toán") || subject.includes("Hóa học") || subject.includes("Vật lý") || subject.includes("Khoa học")) {
+                body.classList.add('font-science');
+            }
+        }
+        
+        // Function to clean up markdown to avoid hanging periods
+        function cleanMarkdown(text) {
+             const lines = text.split('\n');
+             const cleanedLines = lines.map(line => {
+                // Check if the line is just a period, or ends with a period and whitespace
+                if (line.trim() === '.') {
+                    return ''; // Remove the line entirely
+                }
+                // Handle cases like "text." followed by a newline, where the period is the last character on a line
+                return line.trimEnd(); // Remove trailing whitespace and periods
+            });
+            return cleanedLines.filter(line => line.length > 0).join('\n');
+        }
+        
         // --- API Call and Solution Handling ---
-
         solveBtn.addEventListener('click', async () => {
             const userText = questionInput.value.trim();
-
             if (!userText && !imageData) {
                 showError('Vui lòng nhập câu hỏi hoặc tải lên hình ảnh.');
                 return;
             }
 
-            // Show loading state
             loadingIndicator.classList.remove('hidden');
             answerContainer.innerHTML = '';
             errorMessage.classList.add('hidden');
             solveBtn.disabled = true;
             solveBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            geminiFeatures.classList.add('hidden');
+            lastQuestionText = userText;
 
             try {
-                // Construct the prompt for the AI model
                 const prompt = `Bạn là một gia sư AI chuyên nghiệp, có thể giải đáp các câu hỏi thuộc mọi môn học từ lớp 1 đến lớp 12 và cả đại học.
 Nhiệm vụ của bạn là:
 1. Phân tích câu hỏi từ văn bản và/hoặc hình ảnh được cung cấp.
 2. **Tự động xác định môn học và lớp học** của câu hỏi một cách chính xác nhất có thể.
 3. Trình bày lời giải một cách chi tiết, từng bước, dễ hiểu, khoa học và trực quan.
-4. Sử dụng định dạng Markdown để trình bày câu trả lời. Đặc biệt, **sử dụng cú pháp LaTeX được bao bọc bởi $$ cho tất cả các công thức toán học, hóa học, vật lý** (ví dụ: $$x^2 + y^2 = z^2$$).
+4. **Sử dụng cú pháp Markdown cho toàn bộ câu trả lời. Đặc biệt, sử dụng cú pháp LaTeX được bao bọc bởi $$ cho tất cả các công thức toán học, hóa học, vật lý** (ví dụ: $$x^2 + y^2 = z^2$$).
 5. Bắt đầu câu trả lời bằng việc nêu rõ môn học và lớp học bạn đã xác định. Ví dụ: "**Môn:** Toán - **Lớp:** 9". Nếu không chắc chắn, hãy ghi "Không xác định".
 6. Giữ giọng văn thân thiện, khuyến khích như một người gia sư thực thụ.
+7. Đảm bảo rằng câu trả lời được trình bày một cách khoa học, logic và không có các dấu chấm câu hoặc ký tự ngắt dòng không cần thiết ở cuối câu.
 
 Dưới đây là câu hỏi của người dùng:
 Văn bản: "${userText}"`;
@@ -268,10 +318,7 @@ Văn bản: "${userText}"`;
                     contents: [{ role: "user", parts: parts }]
                 };
                 
-                const apiKey = "AIzaSyACWW1mR0t1epof6pnZPwTFERAS2XKiSCA"; // API key will be provided by the environment
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-                const response = await fetch(apiUrl, {
+                const response = await fetch(apiUrl + apiKey, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -286,11 +333,18 @@ Văn bản: "${userText}"`;
                 
                 if (result.candidates && result.candidates.length > 0) {
                     const aiResponseText = result.candidates[0].content.parts[0].text;
-                    // Use marked to convert Markdown to HTML
-                    const htmlContent = marked.parse(aiResponseText);
+                    lastAnswerText = aiResponseText;
+
+                    const cleanedText = cleanMarkdown(aiResponseText);
+                    const htmlContent = marked.parse(cleanedText);
                     answerContainer.innerHTML = htmlContent;
+
+                    // Extract subject to change font
+                    const subjectMatch = aiResponseText.match(/\*\*Môn:\*\* (.*?) -/);
+                    if (subjectMatch && subjectMatch[1]) {
+                        setFontBasedOnSubject(subjectMatch[1]);
+                    }
                     
-                    // Use KaTeX to render math formulas within the new content
                     renderMathInElement(answerContainer, {
                         delimiters: [
                             {left: '$$', right: '$$', display: true},
@@ -300,6 +354,7 @@ Văn bản: "${userText}"`;
                         ],
                         throwOnError: false
                     });
+                    geminiFeatures.classList.remove('hidden');
 
                 } else {
                     showError('Không nhận được phản hồi hợp lệ từ AI. Vui lòng thử lại.');
@@ -309,10 +364,52 @@ Văn bản: "${userText}"`;
                 console.error('Error:', error);
                 showError(`Đã có lỗi xảy ra: ${error.message}`);
             } finally {
-                // Hide loading state and re-enable button
                 loadingIndicator.classList.add('hidden');
                 solveBtn.disabled = false;
                 solveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        });
+
+        // --- New Gemini-powered features ---
+
+        relatedStoriesBtn.addEventListener('click', async () => {
+            loadingIndicator.classList.remove('hidden');
+            answerContainer.innerHTML = '';
+            errorMessage.classList.add('hidden');
+            geminiFeatures.classList.add('hidden');
+
+            try {
+                const prompt = `Dựa trên câu hỏi "${lastQuestionText}" và câu trả lời đã cho "${lastAnswerText}", hãy tạo ra một câu chuyện hoặc một vài sự thật thú vị liên quan đến chủ đề này. Trả lời bằng tiếng Việt.`;
+                const payload = {
+                    contents: [{ role: "user", parts: [{ text: prompt }] }]
+                };
+                
+                const response = await fetch(apiUrl + apiKey, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error?.message || 'Có lỗi khi gợi ý câu chuyện liên quan.');
+                }
+
+                const result = await response.json();
+                const aiResponseText = result.candidates[0].content.parts[0].text;
+                const htmlContent = marked.parse(aiResponseText);
+                answerContainer.innerHTML = `
+                    <div class="p-4 bg-white rounded-lg">
+                        <h3 class="text-xl font-semibold mb-2 text-[#B48D73]">Câu chuyện thú vị</h3>
+                        ${htmlContent}
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error:', error);
+                showError(`Đã có lỗi xảy ra khi gợi ý: ${error.message}`);
+            } finally {
+                loadingIndicator.classList.add('hidden');
+                geminiFeatures.classList.remove('hidden');
             }
         });
 
@@ -320,9 +417,8 @@ Văn bản: "${userText}"`;
         function showError(message) {
             errorMessage.textContent = message;
             errorMessage.classList.remove('hidden');
-            answerContainer.innerHTML = ''; // Clear any previous answers
+            answerContainer.innerHTML = '';
         }
-
     </script>
 </body>
 </html>
